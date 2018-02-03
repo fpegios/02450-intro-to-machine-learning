@@ -3,5 +3,6 @@
 
 ## Instructions
 
-- Create a new project in Pycharm with name **02450-intro-to-machine-learning**
-- Clone the repo in the created project directory
+- Clone the repo
+- Open the folder in PyCharm
+
