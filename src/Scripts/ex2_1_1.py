@@ -7,15 +7,20 @@ doc = xlrd.open_workbook('../Data/nanonose.xls').sheet_by_index(0)
 
 # Extract attribute names (1st row, column 4 to 12)
 attributeNames = doc.row_values(0, 3, 11)
+# print(attributeNames);
 
 # Extract class names to python list,
 # then encode with integers (dict)
 classLabels = doc.col_values(0, 2, 92)
+# print(classLabels);
 classNames = sorted(set(classLabels))
+# print(classNames);
 classDict = dict(zip(classNames, range(5)))
+# print(classDict);
 
 # Extract vector y, convert to NumPy matrix and transpose
 y = np.mat([classDict[value] for value in classLabels]).T
+# print(y);
 
 # Preallocate memory, then extract excel data to matrix X
 X = np.mat(np.empty((90, 8)))
@@ -24,7 +29,11 @@ for i, col_id in enumerate(range(3, 11)):
 
 # Compute values of N, M and C.
 N = len(y)
+print(N)
 M = len(attributeNames)
+print(M)
 C = len(classNames)
+print(C)
 
 print('Ran Exercise 2.1.1')
+print(X)
