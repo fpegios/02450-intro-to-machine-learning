@@ -29,11 +29,11 @@ for i, col_id in enumerate(range(3, 11)):
 
 # Compute values of N, M and C.
 N = len(y)
-print(N)
+# print(N)
 M = len(attributeNames)
-print(M)
+# print(M)
 C = len(classNames)
-print(C)
+# print(C)
 
 print('Ran Exercise 2.1.1')
-print(X)
+# print(X)

@@ -16,7 +16,7 @@ rho = (S*S) / (S*S).sum()
 
 # Plot variance explained
 figure()
-plot(range(1,len(rho)+1),rho,'o-')
+plot(range(1, len(rho)+1), rho, 'o-')
 title('Variance explained by principal components');
 xlabel('Principal component');
 ylabel('Variance explained');
