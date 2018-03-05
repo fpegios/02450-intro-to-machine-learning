@@ -19,14 +19,14 @@ model.fit(X,y)
 # Predict alcohol content
 y_est = model.predict(X)
 residual = y_est-y
-
+print(np.std(y))
 # Display scatter plot
 figure()
 subplot(2,1,1)
 plot(y, y_est, '.')
 xlabel('Alcohol content (true)'); ylabel('Alcohol content (estimated)');
 subplot(2,1,2)
-hist(residual,40)
+hist(residual, 100)
 
 show()
 

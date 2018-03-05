@@ -21,6 +21,7 @@ X = X[valid_mask,:]
 y = y[valid_mask,:]
 # Remove attribute 12 (Quality score)
 X = X[:,0:11]
+print(X)
 attributeNames = attributeNames[0:11]
 # Update N and M
 N, M = X.shape

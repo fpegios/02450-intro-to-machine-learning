@@ -13,4 +13,8 @@ dtc = dtc.fit(X,y)
 # (note: you can use i.e. Graphviz application to visualize the file)
 out = tree.export_graphviz(dtc, out_file='tree_gini.gvz', feature_names=attributeNames)
 
+import graphviz
+
+graphviz.render('dot', 'png', 'tree_gini.gvz')
+
 print('Ran Exercise 5.1.2')

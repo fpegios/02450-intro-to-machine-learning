@@ -9,7 +9,7 @@ import numpy as np
 # Digits to include in analysis (to include all, n = range(10) )
 n = [0,1]
 # Number of principal components for reconstruction
-K = 16
+K = 12
 # Digits to visualize
 nD = range(6);
 
@@ -44,6 +44,7 @@ Xc = X - np.ones((N,1))*X.mean(0)
 U,S,V = linalg.svd(Xc,full_matrices=False)
 #U = mat(U)
 V = V.T
+print(U.shape)
 
 # Compute variance explained by principal components
 rho = (S*S) / (S*S).sum() 

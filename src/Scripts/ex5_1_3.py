@@ -14,3 +14,7 @@ dtc = dtc.fit(X,y)
 # Export tree graph for visualization purposes:
 # (note: you can use i.e. Graphviz application to visualize the file)
 out = tree.export_graphviz(dtc, out_file='tree_deviance.gvz', feature_names=attributeNames)
+
+import graphviz
+
+graphviz.render('dot', 'png', 'tree_deviance.gvz')

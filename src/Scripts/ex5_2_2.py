@@ -17,6 +17,7 @@ y_true = y - eps
 # Fit ordinary least squares regression model
 model = lm.LinearRegression(fit_intercept=True)
 model = model.fit(X,y)
+print(model.intercept_)
 # Compute model output:
 y_est = model.predict(X)
 # Or equivalently:
