@@ -10,7 +10,7 @@ from toolbox_02450 import rlr_validate
 
 mat_data = loadmat('../Data/body.mat')
 X = mat_data['X']
-y = mat_data['y']#.squeeze()
+y = mat_data['y'].squeeze()
 attributeNames = [name[0] for name in mat_data['attributeNames'][0]]
 N, M = X.shape
 
@@ -22,7 +22,8 @@ M = M+1
 ## Crossvalidation
 # Create crossvalidation partition for evaluation
 K = 5
-CV = model_selection.KFold(K)
+CV = model_selection.KFold(K, shuffle=True)
+#CV = model_selection.KFold(K, shuffle=False)
 
 # Values of lambda
 lambdas = np.power(10.,range(-5,9))
@@ -35,8 +36,8 @@ Error_train_rlr = np.empty((K,1))
 Error_test_rlr = np.empty((K,1))
 Error_train_nofeatures = np.empty((K,1))
 Error_test_nofeatures = np.empty((K,1))
-w_rlr = np.matrix(np.empty((M,K)))
-w_noreg = np.matrix(np.empty((M,K)))
+w_rlr = np.empty((M,K))
+w_noreg = np.empty((M,K))
 
 k=0
 for train_index, test_index in CV.split(X,y):
@@ -54,20 +55,20 @@ for train_index, test_index in CV.split(X,y):
     XtX = X_train.T @ X_train
     
     # Compute mean squared error without using the input data at all
-    Error_train_nofeatures[k] = np.square(y_train-y_train.mean()).sum()/y_train.shape[0]
-    Error_test_nofeatures[k] = np.square(y_test-y_test.mean()).sum()/y_test.shape[0]
+    Error_train_nofeatures[k] = np.square(y_train-y_train.mean()).sum(axis=0)/y_train.shape[0]
+    Error_test_nofeatures[k] = np.square(y_test-y_test.mean()).sum(axis=0)/y_test.shape[0]
 
     # Estimate weights for the optimal value of lambda, on entire training set
-    w_rlr[:,k] = np.linalg.lstsq(XtX+opt_lambda*np.eye(M),Xty)[0]
+    w_rlr[:,k] = np.linalg.solve(XtX+opt_lambda*np.eye(M),Xty).squeeze()
     # Compute mean squared error with regularization with optimal lambda
-    Error_train_rlr[k] = np.square(y_train-X_train @ w_rlr[:,k]).sum()/y_train.shape[0]
-    Error_test_rlr[k] = np.square(y_test-X_test @ w_rlr[:,k]).sum()/y_test.shape[0]
+    Error_train_rlr[k] = np.square(y_train-X_train @ w_rlr[:,k]).sum(axis=0)/y_train.shape[0]
+    Error_test_rlr[k] = np.square(y_test-X_test @ w_rlr[:,k]).sum(axis=0)/y_test.shape[0]
 
     # Estimate weights for unregularized linear regression, on entire training set
-    w_noreg[:,k] = np.linalg.lstsq(XtX,Xty)[0]
+    w_noreg[:,k] = np.linalg.solve(XtX,Xty).squeeze()
     # Compute mean squared error without regularization
-    Error_train[k] = np.square(y_train-X_train @ w_noreg[:,k]).sum()/y_train.shape[0]
-    Error_test[k] = np.square(y_test-X_test @ w_noreg[:,k]).sum()/y_test.shape[0]
+    Error_train[k] = np.square(y_train-X_train @ w_noreg[:,k]).sum(axis=0)/y_train.shape[0]
+    Error_test[k] = np.square(y_test-X_test @ w_noreg[:,k]).sum(axis=0)/y_test.shape[0]
     # OR ALTERNATIVELY: you can use sklearn.linear_model module for linear regression:
     #m = lm.LinearRegression().fit(X_train, y_train)
     #Error_train[k] = np.square(y_train-m.predict(X_train)).sum()/y_train.shape[0]

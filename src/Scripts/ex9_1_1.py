@@ -18,7 +18,7 @@ C = len(classNames)
 
 # K-fold crossvalidation with stratified folds
 K = 2
-CV = StratifiedKFold(K)
+CV = StratifiedKFold(K, shuffle=True)
 
 k=0
 for train_index, test_index in CV.split(X,y):

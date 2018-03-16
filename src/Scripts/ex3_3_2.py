@@ -5,8 +5,8 @@ from similarity import similarity
 
 # Generate two data objects with M random attributes
 M = 5;
-x = np.mat(np.random.rand(1,M))
-y = np.mat(np.random.rand(1,M))
+x = np.random.rand(1,M)
+y = np.random.rand(1,M)
 
 # Two constants
 a = 1.5

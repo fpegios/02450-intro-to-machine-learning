@@ -8,7 +8,7 @@ N = 100
 
 # Attribute values
 X = np.array(range(N))
-print(X)
+
 # Noise
 eps_mean, eps_std = 0, 0.1
 eps = np.array(eps_std*np.random.randn(N) + eps_mean)
@@ -28,4 +28,4 @@ title('Illustration of a linear relation with noise')
 
 show()
 
-print('Ran Exercise 5.1.7')
+print('Ran Exercise 5.2.1')

@@ -13,9 +13,9 @@ K = [8,10,15,20,30,40,50,60,100,150]
 # Load Matlab data file and extract training set and test set
 mat_data = loadmat('../Data/zipdata.mat')
 X = mat_data['traindata'][:,1:]
-y = mat_data['traindata'][:,0].T
+y = mat_data['traindata'][:,0]
 Xtest = mat_data['testdata'][:,1:]
-ytest = mat_data['testdata'][:,0].T
+ytest = mat_data['testdata'][:,0]
 N,M = X.shape
 Ntest = Xtest.shape[0] # or Xtest[:,0].shape
 

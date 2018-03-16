@@ -33,8 +33,8 @@ K = 4
 CV = model_selection.KFold(K,shuffle=True)
 
 # Variable for classification error
-errors = np.zeros(K)
-error_hist = np.zeros((max_epochs,K))
+errors = np.zeros(K)*np.nan
+error_hist = np.zeros((max_epochs,K))*np.nan
 bestnet = list()
 k=0
 for train_index, test_index in CV.split(X,y):

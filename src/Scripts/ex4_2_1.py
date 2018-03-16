@@ -9,7 +9,7 @@ from scipy.stats import zscore
 # Load Matlab data file and extract variables of interest
 mat_data = loadmat('../Data/wine.mat')
 X = mat_data['X']
-y = mat_data['y']
+y = mat_data['y'].squeeze()
 C = mat_data['C'][0,0]
 M = mat_data['M'][0,0]
 N = mat_data['N'][0,0]
@@ -74,7 +74,7 @@ valid_mask = np.logical_not(outlier_mask)
 
 # Finally we will remove these from the data set
 X = X[valid_mask,:]
-y = y[valid_mask,:]
+y = y[valid_mask]
 N = len(y)
 
 

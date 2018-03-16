@@ -15,7 +15,7 @@ ngen = 10
 # and extract variables of interest
 traindata = loadmat('../Data/zipdata.mat')['traindata']
 X = traindata[:,1:]
-y = traindata[:,0].T
+y = traindata[:,0]
 N, M = np.shape(X) #or X.shape
 C = len(n)
 

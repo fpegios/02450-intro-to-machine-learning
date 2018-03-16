@@ -12,7 +12,7 @@ Y = X - np.ones((N,1))*X.mean(0)
 U,S,V = svd(Y,full_matrices=False)
 V = V.T
 # Project the centered data onto principal component space
-Z = Y * V
+Z = Y @ V
 
 
 # Indices of the principal components to be plotted
@@ -25,7 +25,7 @@ title('NanoNose data: PCA')
 #Z = array(Z)
 for c in range(C):
     # select indices belonging to class c:
-    class_mask = y.A.ravel()==c
+    class_mask = y==c
     plot(Z[class_mask,i], Z[class_mask,j], 'o')
 legend(classNames)
 xlabel('PC{0}'.format(i+1))

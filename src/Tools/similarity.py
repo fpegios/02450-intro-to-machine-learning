@@ -77,3 +77,16 @@ def binarize(X,Y=None):
         return [binarize(X,None),binarize(Y,None)]
         
 
+## Example
+#import numpy as np
+#from similarity import binarize2
+#A = np.asarray([[1,2,3,4,5],[6,7,8,9,10],[1,2,3,4,5],[6,7,8,9,10]]).T
+#binarize2(A,['a','b','c','d'])
+def binarize2(X,columnnames):
+    X = np.concatenate((binarize(X),1-binarize(X)),axis=1)
+
+    new_column_names = []
+    [new_column_names.append(elm) for elm in [name+' 50th-100th percentile' for name in columnnames]]
+    [new_column_names.append(elm) for elm in [name+' 0th-50th percentile' for name in columnnames]]
+
+    return X, new_column_names

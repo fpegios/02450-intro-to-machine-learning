@@ -24,7 +24,7 @@ title('NanoNose data')
 
 for c in range(C):
     # select indices belonging to class c:
-    class_mask = y.A.ravel()==c
+    class_mask = y==c
     plot(X[class_mask,i], X[class_mask,j], 'o')
 
 legend(classNames)

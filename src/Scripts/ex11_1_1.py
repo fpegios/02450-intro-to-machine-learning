@@ -16,7 +16,7 @@ N, M = X.shape
 C = len(classNames)
 # Number of clusters
 K = 10
-cov_type = 'diag'       
+cov_type = 'full'       
 # type of covariance, you can try out 'diag' as well
 reps = 1                
 # number of fits with different initalizations, best result will be kept
@@ -28,19 +28,17 @@ cds = gmm.means_
 # extract cluster centroids (means of gaussians)
 covs = gmm.covariances_
 # extract cluster shapes (covariances of gaussians)
-if cov_type == 'diag':    
+if cov_type.lower() == 'diag':
     new_covs = np.zeros([K,M,M])    
-
-count = 0    
-for elem in covs:        
-    temp_m = np.zeros([M,M])        
-    for i in range(len(elem)):            
-        temp_m[i][i] = elem[i]        
     
-    new_covs[count] = temp_m        
-    count += 1
-        
-covs = new_covs
+    count = 0    
+    for elem in covs:
+        temp_m = np.zeros([M,M])
+        new_covs[count] = np.diag(elem)
+        count += 1
+
+    covs = new_covs
+
 # Plot results:
 figure(figsize=(14,9))
 clusterplot(X, clusterid=cls, centroids=cds, y=y, covars=covs)

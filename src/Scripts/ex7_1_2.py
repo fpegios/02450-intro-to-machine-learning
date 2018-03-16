@@ -15,7 +15,7 @@ L=40
 CV = model_selection.LeaveOneOut()
 errors = np.zeros((N,L))
 i=0
-for train_index, test_index in CV.split(X):
+for train_index, test_index in CV.split(X, y):
     print('Crossvalidation fold: {0}/{1}'.format(i+1,N))    
     
     # extract training and test set for current CV fold

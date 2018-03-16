@@ -37,12 +37,12 @@ max_epochs = 64         # stop criterion 2 (max epochs in training)
 show_error_freq = 5     # frequency of training status updates
 
 # K-fold crossvalidation
-K = 3                   # only five folds to speed up this example
+K = 3                   # only three folds to speed up this example
 CV = model_selection.KFold(K,shuffle=True)
 
 # Variable for classification error
-errors = np.zeros(K)
-error_hist = np.zeros((max_epochs,K))
+errors = np.zeros(K)*np.nan
+error_hist = np.zeros((max_epochs,K))*np.nan
 bestnet = list()
 k=0
 for train_index, test_index in CV.split(X,y):
@@ -54,7 +54,7 @@ for train_index, test_index in CV.split(X,y):
     X_test = X[test_index,:]
     y_test = y[test_index]
     
-    best_train_error = 1e100
+    best_train_error = np.inf
     for i in range(n_train):
         print('Training network {0}/{1}...'.format(i+1,n_train))
         # Create randomly initialized network with 2 layers
@@ -71,9 +71,8 @@ for train_index, test_index in CV.split(X,y):
     print('Best train error: {0}...'.format(best_train_error))
     y_est = bestnet[k].sim(X_test).squeeze()
     errors[k] = np.power(y_est-y_test,2).sum().astype(float)/y_test.shape[0]
-    break
     k+=1
-    
+    #break
 
 # Print the average least squares error
 print('Mean-square error: {0}'.format(np.mean(errors)))
@@ -91,6 +90,3 @@ print('Ran Exercise 8.2.6')
 #% The weights if the network can be extracted via
 #bestnet[0].layers[0].np['w'] # Get the weights of the first layer
 #bestnet[0].layers[0].np['b'] # Get the bias of the first layer
-
-
-

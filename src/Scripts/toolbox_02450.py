@@ -1,9 +1,5 @@
 ''' Collection of functions and tools for the needs of 02450 Introduction to Machine Learning course.'''
-#from pylab import *
-import sklearn.metrics.cluster as cluster_metrics
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn import model_selection, linear_model
+from pylab import *
 
 def remove_zero_cols(m):
     '''Function removes from given matrix m the column vectors containing only zeros.'''
@@ -26,13 +22,13 @@ def remove_zero_rows_and_cols(m):
 
 def bmplot(yt, xt, X):
     ''' Function plots matrix X as image with lines separating fields. '''
-    plt.imshow(X,interpolation='none',cmap='bone')
-    plt.xticks(range(0,len(xt)), xt)
-    plt.yticks(range(0,len(yt)), yt)
+    imshow(X,interpolation='none',cmap='bone')
+    xticks(range(0,len(xt)), xt)
+    yticks(range(0,len(yt)), yt)
     for i in range(0,len(yt)):
-        plt.axhline(i-0.5, color='black')
+        axhline(i-0.5, color='black')
     for i in range(0,len(xt)):
-        plt.axvline(i-0.5, color='black')
+        axvline(i-0.5, color='black')
 
 
 def glm_validate(X,y,cvf=10):
@@ -45,8 +41,8 @@ def glm_validate(X,y,cvf=10):
         y       vector of values
         cvf     number of crossvalidation folds        
     '''
-    y = y.squeeze()
-    CV = model_selection.KFold(n_splits=cvf, shuffle=True)
+    from sklearn import model_selection, linear_model
+    CV = model_selection.KFold(n_splits=cvf)
     validation_error=np.empty(cvf)
     f=0
     for train_index, test_index in CV.split(X):
@@ -82,7 +78,7 @@ def feature_selector_lr(X,y,cvf=10,features_record=None,loss_record=None,display
             feature_selector_lr(X_train, y_train, cvf=10)
             
     ''' 
-    y = y.squeeze() #ÆNDRING JLH #9/3
+
     # first iteration error corresponds to no-feature estimator
     if loss_record is None:
         loss_record = np.array([np.square(y-y.mean()).sum()/y.shape[0]])
@@ -139,13 +135,13 @@ def rlr_validate(X,y,lambdas,cvf=10):
         train_err_vs_lambda train error as function of lambda (vector)
         test_err_vs_lambda  test error as function of lambda (vector)
     '''
-    CV = model_selection.KFold(cvf, shuffle=True)
+    from sklearn import model_selection
+    CV = model_selection.KFold(cvf)
     M = X.shape[1]
     w = np.empty((M,cvf,len(lambdas)))
     train_error = np.empty((cvf,len(lambdas)))
     test_error = np.empty((cvf,len(lambdas)))
     f = 0
-    y = y.squeeze()
     for train_index, test_index in CV.split(X,y):
         X_train = X[train_index]
         y_train = y[train_index]
@@ -159,18 +155,18 @@ def rlr_validate(X,y,lambdas,cvf=10):
         for l in range(0,len(lambdas)):
             # Compute parameters for current value of lambda and current CV fold
             # note: "linalg.lstsq(a,b)" is substitue for Matlab's left division operator "\"
-            w[:,f,l] = np.linalg.solve(XtX+lambdas[l] * np.eye(M),Xty).squeeze()
+            w[:,f,l] = linalg.lstsq(XtX+lambdas[l] * np.eye(M),Xty)[0].squeeze()
             # Evaluate training and test performance
-            train_error[f,l] = np.power(y_train-X_train @ w[:,f,l].T,2).mean(axis=0)
-            test_error[f,l] = np.power(y_test-X_test @ w[:,f,l].T,2).mean(axis=0)
+            train_error[f,l] = np.power(y_train-X_train @ w[:,f,l].T,2).sum()/y_train.shape[0]
+            test_error[f,l] = np.power(y_test-X_test @ w[:,f,l].T,2).sum()/y_test.shape[0]
     
         f=f+1
 
-    opt_val_err = np.min(np.mean(test_error,axis=0))
-    opt_lambda = lambdas[np.argmin(np.mean(test_error,axis=0))]
-    train_err_vs_lambda = np.mean(train_error,axis=0)
-    test_err_vs_lambda = np.mean(test_error,axis=0)
-    mean_w_vs_lambda = np.squeeze(np.mean(w,axis=1))
+    opt_val_err = np.min(np.mean(test_error,0))
+    opt_lambda = lambdas[np.argmin(np.mean(test_error,0))]
+    train_err_vs_lambda = np.mean(train_error,0)
+    test_err_vs_lambda = np.mean(test_error,0)
+    mean_w_vs_lambda = np.squeeze(np.mean(w,1))
     
     return opt_val_err, opt_lambda, mean_w_vs_lambda, train_err_vs_lambda, test_err_vs_lambda
         
@@ -181,7 +177,7 @@ def dbplotf(X,y,fun,grid_range,resolution=100.0) :
     if np.ndim(y)>1: y = np.argmax(y,1)
     # compute grid range if not given explicitly:
     if grid_range=='auto':
-        grid_range = [X.min(axis=0)[0], X.max(axis=0)[0], X.min(axis=0)[1], X.max(axis=0)[1]]
+        grid_range = [X.min(0)[0], X.max(0)[0], X.min(0)[1], X.max(0)[1]]
         
     delta_f1 = np.float(grid_range[1]-grid_range[0])/float(resolution)
     delta_f2 = np.float(grid_range[3]-grid_range[2])/float(resolution)
@@ -198,7 +194,7 @@ def dbplotf(X,y,fun,grid_range,resolution=100.0) :
         C_colors=[]
         C_legend=[]
         for c in range(C):
-            C_colors.append(plt.cm.jet.__call__(c*255/(C-1))[:3])
+            C_colors.append(cm.jet.__call__(c*255/(C-1))[:3])
             C_legend.append('Class {0}'.format(c))
         C_levels = [.74, 1.5, 2.26]
     
@@ -215,12 +211,12 @@ def dbplotf(X,y,fun,grid_range,resolution=100.0) :
             
     #hold(True)
     for c in range(C):
-        cmask = (y==c); plt.plot(X[cmask,0], X[cmask,1], '.', color=C_colors[c], markersize=10)
-    plt.title('Model prediction and decision boundary')
-    plt.xlabel('Feature 1'); plt.ylabel('Feature 2');
-    plt.contour(F1, F2, values, levels=C_levels, colors=['k'], linestyles='dashed')
-    plt.contourf(F1, F2, values, levels=np.linspace(values.min(),values.max(),levels), cmap=plt.cm.jet, origin='image')
-    plt.colorbar(format='%.1f'); plt.legend(C_legend)
+        cmask = (y==c); plot(X[cmask,0], X[cmask,1], '.', color=C_colors[c], markersize=10)
+    title('Model prediction and decision boundary')
+    xlabel('Feature 1'); ylabel('Feature 2');
+    contour(F1, F2, values, levels=C_levels, colors=['k'], linestyles='dashed')
+    contourf(F1, F2, values, levels=linspace(values.min(),values.max(),levels), cmap=cm.jet, origin='image')
+    colorbar(format='%.1f'); legend(C_legend)
     #hold(False) 
  
 def dbplot(classifier, X, y, grid_range, resolution=100):
@@ -229,16 +225,16 @@ def dbplot(classifier, X, y, grid_range, resolution=100):
     # smoothness of color-coding:
     levels = 100
     # convert from one-out-of-k encoding, if neccessary:
-    if np.ndim(y)>1: y = np.argmax(y,1)
+    if np.ndim(y)>1: y = argmax(y,1)
     # compute grid range if not given explicitly:
     if grid_range=='auto':
         grid_range = [X.min(0)[0], X.max(0)[0], X.min(0)[1], X.max(0)[1]]
         
     delta_f1 = np.float(grid_range[1]-grid_range[0])/resolution
     delta_f2 = np.float(grid_range[3]-grid_range[2])/resolution
-    f1 = np.arange(grid_range[0],grid_range[1],delta_f1)
-    f2 = np.arange(grid_range[2],grid_range[3],delta_f2)
-    F1, F2 = np.meshgrid(f1, f2)
+    f1 = arange(grid_range[0],grid_range[1],delta_f1)
+    f2 = arange(grid_range[2],grid_range[3],delta_f2)
+    F1, F2 = meshgrid(f1, f2)
     C = len(np.unique(y).tolist())
     # adjust color coding:
     if C==2: C_colors = ['b', 'r']; C_legend = ['Class A (y=0)', 'Class B (y=1)']; C_levels = [.5]
@@ -249,7 +245,7 @@ def dbplot(classifier, X, y, grid_range, resolution=100):
         C_colors=[]
         C_legend=[]
         for c in range(C):
-            C_colors.append(plt.cm.jet.__call__(c*255/(C-1))[:3])
+            C_colors.append(cm.jet.__call__(c*255/(C-1))[:3])
             C_legend.append('Class {0}'.format(c))
         C_levels = [.74, 1.5, 2.26]
 
@@ -260,12 +256,12 @@ def dbplot(classifier, X, y, grid_range, resolution=100):
             
     #hold(True)
     for c in range(C):
-        cmask = (y==c); plt.plot(X[cmask,0], X[cmask,1], '.', color=C_colors[c], markersize=10)
-    plt.title('Model prediction and decision boundary')
-    plt.xlabel('Feature 1'); plt.ylabel('Feature 2');
-    plt.contour(F1, F2, values, levels=C_levels, colors=['k'], linestyles='dashed')
-    plt.contourf(F1, F2, values, levels=np.linspace(values.min(),values.max(),levels), cmap=plt.cm.jet, origin='image')
-    plt.colorbar(format='%.1f'); plt.legend(C_legend)
+        cmask = (y==c); plot(X[cmask,0], X[cmask,1], '.', color=C_colors[c], markersize=10)
+    title('Model prediction and decision boundary')
+    xlabel('Feature 1'); ylabel('Feature 2');
+    contour(F1, F2, values, levels=C_levels, colors=['k'], linestyles='dashed')
+    contourf(F1, F2, values, levels=linspace(values.min(),values.max(),levels), cmap=cm.jet, origin='image')
+    colorbar(format='%.1f'); legend(C_legend)
     #hold(False)
 
 
@@ -275,7 +271,7 @@ def dbprobplot(classifier, X, y, grid_range, resolution=100):
     # smoothness of color-coding:
     levels = 100
     # convert from one-out-of-k encoding, if neccessary:
-    if np.ndim(y)>1: y = np.argmax(y,1)
+    if np.ndim(y)>1: y = argmax(y,1)
     # compute grid range if not given explicitly:
     if grid_range=='auto':
         grid_range = [X.min(0)[0], X.max(0)[0], X.min(0)[1], X.max(0)[1]]
@@ -297,13 +293,13 @@ def dbprobplot(classifier, X, y, grid_range, resolution=100):
            
     #hold(True)
     for c in range(C):
-        cmask = (y==c); plt.plot(X[cmask,0], X[cmask,1], '.', color=C_colors[c], markersize=10)
-    plt.title('Model prediction and decision boundary')
-    plt.xlabel('Feature 1'); plt.ylabel('Feature 2');
+        cmask = (y==c); plot(X[cmask,0], X[cmask,1], '.', color=C_colors[c], markersize=10)
+    title('Model prediction and decision boundary')
+    xlabel('Feature 1'); ylabel('Feature 2');
     
-    plt.contour(F1, F2, values, levels=C_levels, colors=['k'], linestyles='dashed')
-    contourf(F1, F2, values, levels=np.linspace(values.min(),values.max(),levels), cmap=cm.jet, origin='image')
-    plt.colorbar(format='%.1f'); plt.legend(C_legend)
+    contour(F1, F2, values, levels=C_levels, colors=['k'], linestyles='dashed')
+    contourf(F1, F2, values, levels=linspace(values.min(),values.max(),levels), cmap=cm.jet, origin='image')
+    colorbar(format='%.1f'); legend(C_legend)
     #hold(False)
 
 from sklearn import metrics
@@ -351,13 +347,13 @@ def rocplot(p, y):
     #TPR
     AUC = metrics.roc_auc_score(y, p)
     #%%
-    plt.plot(fpr, tpr, 'r', [0, 1], [0, 1], 'k')
-    plt.grid()
-    plt.xlim([-0.01,1.01]); plt.ylim([-0.01,1.01])
-    plt.xticks(np.arange(0,1.1,.1)); plt.yticks(np.arange(0,1.1,.1))
-    plt.xlabel('False positive rate (1-Specificity)')
-    plt.ylabel('True positive rate (Sensitivity)')
-    plt.title('Receiver operating characteristic (ROC)\n AUC={:.3f}'.format(AUC))    
+    plot(fpr, tpr, 'r', [0, 1], [0, 1], 'k')
+    grid()
+    xlim([-0.01,1.01]); ylim([-0.01,1.01])
+    xticks(arange(0,1.1,.1)); yticks(arange(0,1.1,.1))
+    xlabel('False positive rate (1-Specificity)')
+    ylabel('True positive rate (Sensitivity)')
+    title('Receiver operating characteristic (ROC)\n AUC={:.3f}'.format(AUC))    
     
     
     return AUC, tpr, fpr
@@ -381,11 +377,11 @@ def confmatplot(y_true, y_est):
     C = np.unique(y_true).shape[0]
     cm = confusion_matrix(y_true, y_est);
     accuracy = 100*cm.diagonal().sum()/cm.sum(); error_rate = 100-accuracy;
-    plt.imshow(cm, cmap='binary', interpolation='None');
-    plt.colorbar(format='%.2f')
-    plt.xticks(range(C)); plt.yticks(range(C));
-    plt.xlabel('Predicted class'); plt.ylabel('Actual class');
-    plt.title('Confusion matrix (Accuracy: {:}%, Error Rate: {:}%)'.format(accuracy, error_rate));
+    imshow(cm, cmap='binary', interpolation='None');
+    colorbar(format='%.2f')
+    xticks(range(C)); yticks(range(C));
+    xlabel('Predicted class'); ylabel('Actual class');
+    title('Confusion matrix (Accuracy: {:}%, Error Rate: {:}%)'.format(accuracy, error_rate));
     
 
 def bootstrap(X, y, N, weights='auto'):
@@ -468,19 +464,19 @@ def clusterplot(X, clusterid, centroids='None', y='None', covars='None'):
     #hold(True)
     colors = [0]*ncolors
     for color in range(ncolors):
-        colors[color] = plt.cm.jet(color/(ncolors-1))[:3]
+        colors[color] = cm.jet(color/(ncolors-1))[:3]
     for i,cs in enumerate(np.unique(y)):
-        plt.plot(X[(y==cs).ravel(),0], X[(y==cs).ravel(),1], 'o', markeredgecolor='k', markerfacecolor=colors[i],markersize=6, zorder=2)
+        plot(X[(y==cs).ravel(),0], X[(y==cs).ravel(),1], 'o', markeredgecolor='k', markerfacecolor=colors[i],markersize=6, zorder=2)
     for i,cr in enumerate(np.unique(cls)):
-        plt.plot(X[(cls==cr).ravel(),0], X[(cls==cr).ravel(),1], 'o', markersize=12, markeredgecolor=colors[i], markerfacecolor='None', markeredgewidth=3, zorder=1)
+        plot(X[(cls==cr).ravel(),0], X[(cls==cr).ravel(),1], 'o', markersize=12, markeredgecolor=colors[i], markerfacecolor='None', markeredgewidth=3, zorder=1)
     if type(centroids) is not str:        
         for cd in range(centroids.shape[0]):
-            plt.plot(centroids[cd,0], centroids[cd,1], '*', markersize=22, markeredgecolor='k', markerfacecolor=colors[cd], markeredgewidth=2, zorder=3)
+            plot(centroids[cd,0], centroids[cd,1], '*', markersize=22, markeredgecolor='k', markerfacecolor=colors[cd], markeredgewidth=2, zorder=3)
     # plot cluster shapes:
     if type(covars) is not str:
         for cd in range(centroids.shape[0]):
             x1, x2 = gauss_2d(centroids[cd],covars[cd,:,:])
-            plt.plot(x1,x2,'-', color=colors[cd], linewidth=3, zorder=5)
+            plot(x1,x2,'-', color=colors[cd], linewidth=3, zorder=5)
     #hold(False)
 
     # create legend        
@@ -489,7 +485,7 @@ def clusterplot(X, clusterid, centroids='None', y='None', covars='None'):
         if i<C: legend_items[i] = 'Class: {0}'.format(legend_items[i]);
         elif i<C+K: legend_items[i] = 'Cluster: {0}'.format(legend_items[i]);
         else: legend_items[i] = 'Centroid: {0}'.format(legend_items[i]);
-    plt.legend(legend_items, numpoints=1, markerscale=.75, prop={'size': 9})
+    legend(legend_items, numpoints=1, markerscale=.75, prop={'size': 9})
 
 
 def gauss_2d(centroid, ccov, std=2, points=100):
@@ -499,6 +495,8 @@ def gauss_2d(centroid, ccov, std=2, points=100):
     d, v = np.linalg.eig(ccov); d = std * np.sqrt(np.diag(d))
     bp = np.dot(v, np.dot(d, ap)) + np.tile(mean, (1, ap.shape[1])) 
     return bp[0,:], bp[1,:]
+    
+import sklearn.metrics.cluster as cluster_metrics
     
 def clusterval(y, clusterid):
     '''

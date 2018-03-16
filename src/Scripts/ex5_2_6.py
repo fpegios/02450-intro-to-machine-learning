@@ -5,7 +5,6 @@ import sklearn.linear_model as lm
 # requires data from exercise 5.1.4
 from ex5_1_5 import *
 
-y=y.squeeze()
 # Fit logistic regression model
 model = lm.logistic.LogisticRegression()
 model = model.fit(X,y)

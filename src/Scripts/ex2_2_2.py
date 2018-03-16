@@ -9,7 +9,7 @@ import numpy as np
 # Digits to include in analysis (to include all, n = range(10) )
 n = [0,1]
 # Number of principal components for reconstruction
-K = 12
+K = 16
 # Digits to visualize
 nD = range(6);
 
@@ -18,7 +18,7 @@ nD = range(6);
 # and extract variables of interest
 traindata = loadmat('../Data/zipdata.mat')['traindata']
 X = traindata[:,1:]
-y = traindata[:,0].T
+y = traindata[:,0]
 
 N,M = X.shape
 C = len(n)
@@ -44,7 +44,6 @@ Xc = X - np.ones((N,1))*X.mean(0)
 U,S,V = linalg.svd(Xc,full_matrices=False)
 #U = mat(U)
 V = V.T
-print(U.shape)
 
 # Compute variance explained by principal components
 rho = (S*S) / (S*S).sum() 

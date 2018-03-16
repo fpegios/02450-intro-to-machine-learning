@@ -10,12 +10,12 @@ V=V.T
 
 print(V[:,1].T)
 ## Projection of water class onto the 2nd principal component.
-# Note Y is a numpy matrix, while V is a numpy array. 
 
-# Either convert V to a numpy.mat and use * (matrix multiplication)
-print((Y[y.A.ravel()==4,:] * np.mat(V[:,1]).T).T)
+# When Y and V have type numpy.array, then @ is matrix multiplication
+print( Y[y==4,:] @ V[:,1] )
 
-# Or interpret Y as a numpy.array and use @ (matrix multiplication for np.array)
-#print( (np.asarray(Y[y.A.ravel()==4,:]) @ V[:,1]).T )
+# or convert V to a numpy.mat and use * (matrix multiplication for numpy.mat)
+#print((Y[y==4,:] * np.mat(V[:,1]).T).T)
+
 
 print('Ran Exercise 2.1.5')
