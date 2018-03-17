@@ -8,6 +8,7 @@ import numpy as np
 # Load Matlab data file and extract variables of interest
 mat_data = loadmat('../Data/wine2.mat')
 X = mat_data['X']
+print(X)
 y = mat_data['y'].squeeze()
 attributeNames = [name[0] for name in mat_data['attributeNames'][0]]
 classNames = [name[0][0] for name in mat_data['classNames']]

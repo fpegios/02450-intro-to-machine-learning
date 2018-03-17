@@ -105,25 +105,25 @@ ylabel('Attribute')
 # plot the fitted model residual error as function of each attribute to
 # inspect for systematic structure in the residual
 
-f=2 # cross-validation fold to inspect
-ff=Features[:,f-1].nonzero()[0]
-if len(ff) is 0:
-    print('\nNo features were selected, i.e. the data (X) in the fold cannot describe the outcomes (y).' )
-else:
-    m = lm.LinearRegression(fit_intercept=True).fit(X[:,ff], y)
-    
-    y_est= m.predict(X[:,ff])
-    residual=y-y_est
-    
-    figure(k+1, figsize=(12,6))
-    title('Residual error vs. Attributes for features selected in cross-validation fold {0}'.format(f))
-    for i in range(0,len(ff)):
-       subplot(2,np.ceil(len(ff)/2.0),i+1)
-       plot(X[:,ff[i]],residual,'.')
-       xlabel(attributeNames[ff[i]])
-       ylabel('residual error')
-    
-    
-show()
-
-print('Ran Exercise 6.2.1')
+# f=2 # cross-validation fold to inspect
+# ff=Features[:,f-1].nonzero()[0]
+# if len(ff) is 0:
+#     print('\nNo features were selected, i.e. the data (X) in the fold cannot describe the outcomes (y).' )
+# else:
+#     m = lm.LinearRegression(fit_intercept=True).fit(X[:,ff], y)
+#
+#     y_est= m.predict(X[:,ff])
+#     residual=y-y_est
+#
+#     figure(k+1, figsize=(12,6))
+#     title('Residual error vs. Attributes for features selected in cross-validation fold {0}'.format(f))
+#     for i in range(0,len(ff)):
+#        subplot(2,np.ceil(len(ff)/2.0),i+1)
+#        plot(X[:,ff[i]],residual,'.')
+#        xlabel(attributeNames[ff[i]])
+#        ylabel('residual error')
+#
+#
+# show()
+#
+# print('Ran Exercise 6.2.1')
