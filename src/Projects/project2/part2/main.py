@@ -1,43 +1,20 @@
-# Project 2
-
-import xlrd
-import numpy as np
-from scipy import stats
-from sklearn import model_selection, tree
-from matplotlib.pyplot import figure, plot, xlabel, ylabel, legend, show, boxplot
-
 ###############################################################
 # CLASSIFICATION PROBLEM
 ###############################################################
+import numpy as np
+from sklearn import model_selection, tree
 
-# LOAD DATA ###################################################
-doc = xlrd.open_workbook('dataset.xls').sheet_by_index(0)
-numAttributes = 10
-attributeNames = doc.row_values(0, 0, numAttributes)
-numInstances = doc.nrows - 1
-
-# Preallocate memory, then extract attributes data to matrix X
-X = np.empty((numInstances, numAttributes))
-for i in range(numAttributes):
-    X[:, i] = doc.col_values(i, 1, numInstances + 1)
-
-# Preallocate memory, then extract output data to matrix Y
-Y = np.empty((numInstances, 1));
-Y[:, 0] = doc.col_values(numAttributes, 1, numInstances + 1)
-
-# save output class names
-classNames = np.unique(Y)
+from _load_data import *
 
 # [1] ##########################################################################
 # In this problem we are trying to predict one class between
 # 1,2,3,4 and 5 having known 10 attributes
 
-
-# [2.1] DECISION TREE ##########################################################
-################################################################################
 # Initialize variables
 K_out = 5
 K_in = 10
+
+# [2.1] DECISION TREE ##########################################################
 max_depth = 20
 criterion = 'gini'
 tree_complexity = np.arange(2, max_depth + 1, 1)  # Tree complexity parameter - constraint on maximum depth
@@ -50,6 +27,9 @@ error_dec_tree = np.empty(K_out)  # error per model
 CV_out = model_selection.KFold(n_splits=K_out, shuffle=True)
 
 k_out = 0
+print('===========================')
+print('     DECISION TREE')
+print('===========================')
 for train_out_index, test_out_index in CV_out.split(X):
     print('\nComputing CV_out fold: {0}/{1}..'.format(k_out + 1, K_out))
 
@@ -109,77 +89,11 @@ print('Decision Tree Error: {0}'.format(error_dec_tree.mean()))
 print('=======================================')
 print('\n')
 
+# [2.2] ##########################################################
 
-# [2.2] MULTINOMIAL REGRESSION METHOD ##########################################
-################################################################################
+# [2.3] ##########################################################
 
-# [2.3] K-NEAREST NEIGHBORS METHOD #############################################
-################################################################################
+# [3] ############################################################
 
-# [3] ##########################################################################
-################################################################################
-# find the weight of all the methods' models
+# [4] ############################################################
 
-# [4] ##########################################################################
-################################################################################
-f = figure()
-boxplot(error_dec_tree.T)
-xlabel('Decision Tree')
-ylabel('Cross Validation Error '.format(K_out))
-show()
-# show a boxplot of the 5 errors in each method model
-# find the mode of the output of the train data
-# find the misclassification rate over train-mode/test-output data (numpy mode)
-
-# Evaluate misclassification rate over train/test data (in this CV fold)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#     misclass_rate_test = sum(np.abs(y_est_test - Y_test)) / float(len(y_est_test))
-#     misclass_rate_train = sum(np.abs(y_est_train - Y_train)) / float(len(y_est_train))
-#     Error_test[k], Error_train[k] = np.mean(misclass_rate_test), np.mean(misclass_rate_train)
-#     k_out += 1
-#
-# # print(Error_train, Error_test)
-# f = figure()
-# plot(Error_train)
-# plot(Error_test)
-# xlabel('K-Folds')
-# ylabel('Error (misclassification rate)')
-# legend(['Error_train','Error_test'])
-# # show()
