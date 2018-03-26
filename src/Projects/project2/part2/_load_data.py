@@ -1,6 +1,7 @@
 # LOAD DATA ###################################################
 import xlrd
 import numpy as np
+from scipy import stats
 
 doc = xlrd.open_workbook('../../dataset.xls').sheet_by_index(0)
 numAttributes = 10
@@ -16,5 +17,8 @@ for i in range(numAttributes):
 Y = np.empty((numInstances, 1));
 Y[:, 0] = doc.col_values(numAttributes, 1, numInstances + 1)
 
+X = stats.zscore(X)
+
 # save output class names
 classNames = np.unique(Y)
+N, M = X.shape

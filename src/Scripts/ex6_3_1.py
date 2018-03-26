@@ -14,6 +14,7 @@ y = mat_data['y'].squeeze()
 attributeNames = [name[0] for name in mat_data['attributeNames'][0]]
 classNames = [name[0][0] for name in mat_data['classNames']]
 N, M = X.shape
+print(N)
 C = len(classNames)
 
 ## Crossvalidation
