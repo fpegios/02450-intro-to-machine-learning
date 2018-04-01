@@ -42,13 +42,13 @@ for train_index, test_index in CV.split(X,y):
     model = lm.logistic.LogisticRegression(C=N)
     model = model.fit(X_train, y_train)
     y_logreg = model.predict(X_test)
-    Error_logreg[k] = 100*(y_logreg!=y_test).sum().astype(float)/len(y_test)
+    Error_logreg[k] = (y_logreg!=y_test).sum().astype(float)/len(y_test)
     
     # Fit and evaluate Decision Tree classifier
     model2 = tree.DecisionTreeClassifier()
     model2 = model2.fit(X_train, y_train)
     y_dectree = model2.predict(X_test)
-    Error_dectree[k] = 100*(y_dectree!=y_test).sum().astype(float)/len(y_test)
+    Error_dectree[k] = (y_dectree!=y_test).sum().astype(float)/len(y_test)
 
     k+=1
 

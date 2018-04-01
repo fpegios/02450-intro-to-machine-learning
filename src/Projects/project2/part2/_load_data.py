@@ -17,8 +17,11 @@ for i in range(numAttributes):
 Y = np.empty((numInstances, 1));
 Y[:, 0] = doc.col_values(numAttributes, 1, numInstances + 1)
 
+# Normalize data
 X = stats.zscore(X)
 
 # save output class names
 classNames = np.unique(Y)
 N, M = X.shape
+
+# X = X[0:100,:]
