@@ -20,7 +20,7 @@ classNames = [name[0][0] for name in mat_data['classNames']]
 N, M = X.shape
 C = len(classNames)
 
-
+print(y_train)
 # Plot the training data points (color-coded) and test data points.
 figure(1)
 styles = ['.b', '.r', '.g', '.y']

@@ -57,6 +57,7 @@ for train_index, test_index in CV.split(X,y):
 # [tstatistic, pvalue] = stats.ttest_ind(Error_logreg,Error_dectree)
 # and test if the p-value is less than alpha=0.05. 
 z = (Error_logreg-Error_dectree)
+print(Error_logreg)
 zb = z.mean()
 nu = K-1
 sig =  (z-zb).std()  / np.sqrt(K-1)

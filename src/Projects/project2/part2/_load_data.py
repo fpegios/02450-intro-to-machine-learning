@@ -22,6 +22,7 @@ X = stats.zscore(X)
 
 # save output class names
 classNames = np.unique(Y)
+C = len(classNames)
 N, M = X.shape
 
 # X = X[0:100,:]
