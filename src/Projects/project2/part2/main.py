@@ -14,6 +14,7 @@ K_out = 5
 K_in = 10
 # Outer K-fold crossvalidation
 CV_out = model_selection.KFold(n_splits=K_out, shuffle=True)
+error_weight = np.empty(K_out);
 
 # Decision Tree Variables
 max_depth = 20
@@ -22,7 +23,7 @@ tree_complexity = np.arange(2, max_depth + 1, 1)  # Tree complexity parameter - 
 error_per_depth = np.empty((max_depth - 1, K_in))  # error per depth for each k_in
 avg_error_depth = np.empty(max_depth - 1)  # average error per depth
 best_depth = np.empty(K_out)    # best error per k_out
-error_dec_tree = np.empty(K_out)  # error per model
+test_error_dec_tree = np.empty(K_out)  # test error per model
 best_dec_tree_model_error = 1;
 
 # Logistic Regression Variables
@@ -30,7 +31,7 @@ max_c = 5
 error_per_c = np.empty((max_c, K_in))  # error per c for each k_in
 avg_error_c = np.empty(max_c)  # average error per c
 best_c = np.zeros(K_out)    # best error per k_out
-error_log_reg = np.empty(K_out)  # error per model
+test_error_log_reg = np.empty(K_out)  # error per model
 best_log_reg_model_error = 1;
 best_log_reg_model_weight = np.zeros(numAttributes);
 
@@ -39,7 +40,7 @@ max_l = 100
 error_per_l = np.empty((max_l, K_in))  # error per lambda for each k_in
 avg_error_l = np.empty(max_l)  # average error per lambda
 best_l = np.empty(K_out)    # best error per k_out
-error_knn = np.empty(K_out)  # error per model
+test_error_knn = np.empty(K_out)  # error per model
 best_knn_model_error = 1;
 
 k_out = 0
@@ -49,6 +50,7 @@ for train_out_index, test_out_index in CV_out.split(X):
     # extract training and test set for current CV_out fold
     X_train_out, Y_train_out = X[train_out_index,:], Y[train_out_index]
     X_test_out, Y_test_out = X[test_out_index,:], Y[test_out_index]
+    error_weight[k_out] = len(X_test_out)/(len(X_test_out)*K_out);
 
     # Inner K-fold crossvalidation
     CV_in = model_selection.KFold(n_splits=K_in, shuffle=True)
@@ -61,6 +63,7 @@ for train_out_index, test_out_index in CV_out.split(X):
         X_train_in, Y_train_in = X[train_in_index, :], Y[train_in_index]
         X_test_in, Y_test_in = X[test_in_index, :], Y[test_in_index]
 
+        # DECISION TREE
         for depth_index, depth in enumerate(tree_complexity):
             # Fit decision tree classifier with different pruning levels
             dtc = tree.DecisionTreeClassifier(criterion=criterion, max_depth=depth)
@@ -72,6 +75,7 @@ for train_out_index, test_out_index in CV_out.split(X):
             # find average estimated test error per depth for each k_out
             error_per_depth[depth_index, k_out] = error_y_est_test_in.mean()
 
+        # LOGISTIC REGRESSION
         for c_index in range(0, max_c):
             # Fit classifier and classify the test points
             log_reg = lm.LogisticRegression(C=c_index + 1, solver='lbfgs', multi_class='multinomial')
@@ -83,6 +87,7 @@ for train_out_index, test_out_index in CV_out.split(X):
             # find average estimated test error per depth for each k_out
             error_per_c[c_index, k_out] = error_y_est_test_in.mean()
 
+        # KNN
         for l_index in range(0, max_l):
             # Fit classifier and classify the test points
             knn = KNeighborsClassifier(n_neighbors=l_index + 1)
@@ -96,6 +101,8 @@ for train_out_index, test_out_index in CV_out.split(X):
 
         k_in += 1
 
+    # DECISION TREE
+    # =============
     # we find the mean error per depth, and we take the depth with the minimum error
     minError = 1
     for depth_index, depth in enumerate(tree_complexity):
@@ -110,20 +117,25 @@ for train_out_index, test_out_index in CV_out.split(X):
     y_dec_tree = dtc.predict(X_test_out)
 
     # we calculate the final error of each model
-    error_dec_tree[k_out] = (sum(np.abs(y_dec_tree - Y_test_out)) / float(len(y_dec_tree))).mean();
+    test_error_dec_tree[k_out] = (sum(np.abs(y_dec_tree - Y_test_out)) / float(len(y_dec_tree))).mean();
 
     # save the model with the lowest error
-    if error_dec_tree[k_out] <= best_dec_tree_model_error:
-        best_dec_tree_model_error = error_dec_tree[k_out]
+    if test_error_dec_tree[k_out] <= best_dec_tree_model_error:
+        best_dec_tree_model_error = test_error_dec_tree[k_out]
         best_dec_tree_model = dtc
+        best_dec_tree_model_X_train = X_train_out
+        best_dec_tree_model_Y_train = Y_train_out
+        best_dec_tree_model_X_test = X_test_out
+        best_dec_tree_model_Y_test = y_dec_tree
 
-    # Display results
-    print('    =============================')
-    print('    DECISION TREE')
-    print('    Best Depth: {0}'.format(best_depth[k_out]))
-    print('    Error: {0}'.format(error_dec_tree[k_out]))
-    print('\n')
+    print('\n=============================')
+    print('DECISION TREE')
+    print('Best Depth: {0}'.format(best_depth[k_out]))
+    print('Error: {0}'.format(test_error_dec_tree[k_out]))
+    print('=============================')
 
+    # LOGISTIC REGRESSION
+    # ===================
     # we find the mean error per C, and we take the C with the minimum error
     minError = 1
     for c_index in range(0, max_c):
@@ -138,21 +150,26 @@ for train_out_index, test_out_index in CV_out.split(X):
     y_log_reg = log_reg.predict(X_test_out)
 
     # we calculate the error of the model
-    error_log_reg[k_out] = (sum(np.abs(y_log_reg - Y_test_out)) / float(len(y_log_reg))).mean();
+    test_error_log_reg[k_out] = (sum(np.abs(y_log_reg - Y_test_out)) / float(len(y_log_reg))).mean();
 
     # save the model with the lowest error
-    if error_log_reg[k_out] <= best_log_reg_model_error:
-        best_log_reg_model_error = error_log_reg[k_out]
+    if test_error_log_reg[k_out] <= best_log_reg_model_error:
+        best_log_reg_model_error = test_error_log_reg[k_out]
         best_log_reg_model = log_reg
         best_log_reg_model_weight = log_reg.coef_
+        best_log_reg_model_X_train = X_train_out
+        best_log_reg_model_Y_train = Y_train_out
+        best_log_reg_model_X_test = X_test_out
+        best_log_reg_model_Y_test = y_log_reg
 
-    # Display results
-    print('    =============================')
-    print('    LOGISTIC REGRESSION')
-    print('    Best C: {0}'.format(best_c[k_out]))
-    print('    Error: {0}'.format(error_log_reg[k_out]))
-    print('\n')
+    print('=============================')
+    print('LOGISTIC REGRESSION')
+    print('Best C: {0}'.format(best_c[k_out]))
+    print('Error: {0}'.format(test_error_log_reg[k_out]))
+    print('=============================')
 
+    # KNN
+    # =============
     # we find the mean error per C, and we take the C with the minimum error
     minError = 1
     for l_index in range(0, max_l):
@@ -167,32 +184,36 @@ for train_out_index, test_out_index in CV_out.split(X):
     y_knn = knn.predict(X_test_out)
 
     # we calculate the final error of each model
-    error_knn[k_out] = (sum(np.abs(y_knn - Y_test_out)) / float(len(y_knn))).mean();
+    test_error_knn[k_out] = (sum(np.abs(y_knn - Y_test_out)) / float(len(y_knn))).mean();
 
     # save the model with the lowest error
-    if error_knn[k_out] <= best_knn_model_error:
-        best_knn_model_error = error_knn[k_out]
+    if test_error_knn[k_out] <= best_knn_model_error:
+        best_knn_model_error = test_error_knn[k_out]
         best_knn_model = knn
         best_knn_model_X_train = X_train_out
         best_knn_model_Y_train = Y_train_out
         best_knn_model_X_test = X_test_out
         best_knn_model_Y_test = y_knn
 
-    # Display results
-    print('    =============================')
-    print('    KNN')
-    print('    Best Num of Neighbours: {0}'.format(best_l[k_out]))
-    print('    Error: {0}'.format(error_knn[k_out]))
-    print('\n')
+    print('=============================')
+    print('KNN')
+    print('Best Num of Neighbours: {0}'.format(best_l[k_out]))
+    print('Error: {0}'.format(test_error_knn[k_out]))
+    print('=============================\n')
 
     k_out += 1
 
-# knowing the error for the 5 folds, we find the mean of the errors and this is the final error of the method
+# Calculate the generalization error
+gen_error_dec_tree = sum(error_weight * test_error_dec_tree)
+
+print('\n')
 print('==============================================')
-print('Best Decision Tree Depth = {0}'.format(best_dec_tree_model.max_depth))
-print('Best Decision Tree Error: {0}'.format(best_dec_tree_model_error))
+print('    DECISION TREE')
 print('==============================================')
-print('Decision Tree Error: {0}'.format(error_dec_tree.mean()))
+print('Best Model Depth: {0}'.format(best_dec_tree_model.max_depth))
+print('Best Model Error: {0}'.format(best_dec_tree_model_error))
+print('==============================================')
+print('Generalization Error: {0}'.format(gen_error_dec_tree))
 print('==============================================')
 print('\n')
 
@@ -201,17 +222,25 @@ print('\n')
 f = open('dec_tree_data.pckl', 'wb')
 pickle.dump([best_dec_tree_model,
              best_dec_tree_model_error,
-             error_dec_tree],
+             best_dec_tree_model_X_train,
+             best_dec_tree_model_Y_train,
+             best_dec_tree_model_X_test,
+             best_dec_tree_model_Y_test,
+             test_error_dec_tree,
+             gen_error_dec_tree],
             f)
 f.close()
 
-# knowing the error for the 5 folds, we find the mean of the errors and this is the final error of the method
+# Calculate the generalization error
+gen_error_log_reg = sum(error_weight * test_error_log_reg)
+
 print('==============================================')
-print('Best Model C = {0}'.format(best_log_reg_model.C))
+print('    LOGISTIC REGRESSION')
+print('==============================================')
+print('Best Model C: {0}'.format(best_log_reg_model.C))
 print('Best Model Error: {0}'.format(best_log_reg_model_error))
-print('Best Model Weights: {0}'.format(best_log_reg_model_weight))
 print('==============================================')
-print('Multinomial Regression Error: {0}'.format(error_log_reg.mean()))
+print('Generalization Error: {0}'.format(gen_error_log_reg))
 print('==============================================')
 print('\n')
 
@@ -219,18 +248,27 @@ print('\n')
 # and errors of the five models
 f = open('log_reg_data.pckl', 'wb')
 pickle.dump([best_log_reg_model,
-             best_log_reg_model_weight,
              best_log_reg_model_error,
-             error_log_reg],
+             best_log_reg_model_weight,
+             best_log_reg_model_X_train,
+             best_log_reg_model_Y_train,
+             best_log_reg_model_X_test,
+             best_log_reg_model_Y_test,
+             test_error_log_reg,
+             gen_error_log_reg],
             f)
 f.close()
 
-# knowing the error for the 5 folds, we find the mean of the errors and this is the final error of the method
+# Calculate the generalization error
+gen_error_knn = sum(error_weight * test_error_knn)
+
 print('==============================================')
-print('Best Model n_neighbours = {0}'.format(best_knn_model.n_neighbors))
+print('    KNN')
+print('==============================================')
+print('Best Model n_neighbours: {0}'.format(best_knn_model.n_neighbors))
 print('Best Model Error: {0}'.format(best_knn_model_error))
 print('==============================================')
-print('K-Nearest Neighbour Error: {0}'.format(error_knn.mean()))
+print('Generalization Error: {0}'.format(gen_error_knn))
 print('==============================================')
 print('\n')
 
@@ -243,7 +281,8 @@ pickle.dump([best_knn_model,
              best_knn_model_Y_train,
              best_knn_model_X_test,
              best_knn_model_Y_test,
-             error_knn],
+             test_error_knn,
+             gen_error_knn],
             f)
 f.close()
 

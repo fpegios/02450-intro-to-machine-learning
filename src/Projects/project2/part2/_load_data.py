@@ -25,4 +25,4 @@ classNames = np.unique(Y)
 C = len(classNames)
 N, M = X.shape
 
-# X = X[0:100,:]
+# X = X[0:150,:]

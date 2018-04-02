@@ -18,12 +18,22 @@ knn_f = open('knn_data.pckl', 'rb')
 knn = pickle.load(knn_f)
 knn_f.close()
 
-dec_tree_error = dec_tree[len(dec_tree) - 1]
-knn_error = knn[len(knn) - 1]
+dec_tree_gen_error = dec_tree[len(dec_tree) - 1]
+log_reg_gen_error = log_reg[len(log_reg) - 1]
+knn_gen_error = knn[len(knn) - 1]
+
+dec_tree_test_error = dec_tree[len(dec_tree) - 2]
+log_reg_test_error = log_reg[len(log_reg) - 2]
+knn_test_error = knn[len(knn) - 2]
+
+def dec_tree_graph():
+    out = tree.export_graphviz(dec_tree[0], out_file='tree_deviance.gvz', feature_names=attributeNames)
+    src = graphviz.Source.from_file('tree_deviance.gvz')
+    src.render('../tree_deviance', view=True)
 
 def knn_plot():
-    knn_x_train = knn[2];
-    knn_y_train = knn[3];
+    knn_x_train = knn[2]
+    knn_y_train = knn[3]
     knn_x_test = knn[4]
     knn_y_test = knn[5]
 
@@ -72,33 +82,30 @@ def knn_plot():
         plot(knn_x_test[i, attr_1], knn_x_test[i, attr_2], 'kx', markersize=8)
     show()
 
-def dec_tree_graph():
-    out = tree.export_graphviz(dec_tree[0], out_file='tree_deviance.gvz', feature_names=attributeNames)
-    src = graphviz.Source.from_file('tree_deviance.gvz')
-    src.render('../tree_deviance', view=True)
+# dec_tree_graph()
+# knn_plot()
 
-# eqs = log_reg[1];
-# eq1 = eqs[0]
-# eq2 = eqs[1]
-# eq3 = eqs[2]
-# eq4 = eqs[3]
-# eq5 = eqs[4]
-#
-# out = np.zeros(5)
-# print(eq1)
-# pos = 5470
-# out[0] = X[pos,0] * eq1[0] + X[pos,1] * eq1[1] + X[pos,2] * eq1[2] + X[pos,3] * eq1[3] + X[pos,4] * eq1[4] + X[pos,5] * eq1[5] + X[pos,6] * eq1[6] + X[pos,7] * eq1[7] + X[pos,8] * eq1[8] + X[pos,9] * eq1[9];
-# out[1] = X[pos,0] * eq2[0] + X[pos,1] * eq2[1] + X[pos,2] * eq2[2] + X[pos,3] * eq2[3] + X[pos,4] * eq2[4] + X[pos,5] * eq2[5] + X[pos,6] * eq2[6] + X[pos,7] * eq2[7] + X[pos,8] * eq2[8] + X[pos,9] * eq2[9];
-# out[2] = X[pos,0] * eq3[0] + X[pos,1] * eq3[1] + X[pos,2] * eq3[2] + X[pos,3] * eq3[3] + X[pos,4] * eq3[4] + X[pos,5] * eq3[5] + X[pos,6] * eq3[6] + X[pos,7] * eq3[7] + X[pos,8] * eq3[8] + X[pos,9] * eq3[9];
-# out[3] = X[pos,0] * eq4[0] + X[pos,1] * eq4[1] + X[pos,2] * eq4[2] + X[pos,3] * eq4[3] + X[pos,4] * eq4[4] + X[pos,5] * eq4[5] + X[pos,6] * eq4[6] + X[pos,7] * eq4[7] + X[pos,8] * eq4[8] + X[pos,9] * eq4[9];
-# out[4] = X[pos,0] * eq5[0] + X[pos,1] * eq5[1] + X[pos,2] * eq5[2] + X[pos,3] * eq5[3] + X[pos,4] * eq5[4] + X[pos,5] * eq5[5] + X[pos,6] * eq5[6] + X[pos,7] * eq5[7] + X[pos,8] * eq5[8] + X[pos,9] * eq5[9];
+print("\n")
+print("==============================================")
+print("     GENERALIZATION ERROR")
+print("==============================================")
+print("Decision Tree: ", format(dec_tree_gen_error))
+print("Logistic Regression: ", format(log_reg_gen_error))
+print("KNN: ", format(knn_gen_error))
+print("==============================================")
+print("\n")
 
-# eq1 = log_reg
+# [4.1] Credibility Interval
+# Test if classifiers are significantly different by computing credibility interval.
+temp = np.zeros([len(dec_tree_test_error), 1])
+temp[:, 0] = dec_tree_test_error[:];
+dec_tree_test_error = temp;
 
-# [3]
-# Test if classifiers are significantly different using methods in section 9.3.3
-# by computing credibility interval. Notice this can also be accomplished by computing the p-value using
-z = (dec_tree_error - knn_error)
+temp = np.zeros([len(knn_test_error), 1])
+temp[:, 0] = knn_test_error[:];
+knn_test_error = temp;
+
+z = (dec_tree_test_error - knn_test_error)
 zb = z.mean()
 K = 5
 nu = K-1
@@ -108,15 +115,49 @@ alpha = 0.05
 zL = zb + sig * stats.t.ppf(alpha/2, nu);
 zH = zb + sig * stats.t.ppf(1-alpha/2, nu);
 
+print("==============================================")
+print("     CREDIBILITY INTERVAL")
+print("==============================================")
 if zL <= 0 and zH >= 0:
     print('Classifiers are not significantly different')
 else:
     print('Classifiers are significantly different.')
+print("==============================================")
 
 # Boxplot to compare classifier error distributions
 figure()
-boxplot(np.concatenate((dec_tree_error.T, knn_error.T),axis=1))
+boxplot(np.concatenate((dec_tree_test_error, knn_test_error), axis=1))
 xlabel('Decision Tree vs KNN')
 ylabel('Cross-validation error')
 
 show()
+
+# [4.2] Compare in addition if the performance of your models
+# are better than simply predicting all outputs to be the largest
+# class in the training data
+dec_tree_best_model_error = dec_tree[1]
+y_train = dec_tree[3];
+numLargestClass = 0
+for i in range(len(y_train)):
+    if y_train[i] == 1: # class 1 (text) is the largest one
+        numLargestClass+=1;
+
+largestClassProbability = numLargestClass/len(y_train)
+dec_tree_accuracy = 1 - dec_tree_best_model_error;
+
+
+knn_best_model_error = knn[1]
+y_train = knn[3];
+numLargestClass = 0
+for i in range(len(y_train)):
+    if y_train[i] == 1: # class 1 (text) is the largest one
+        numLargestClass+=1;
+
+largestClassProbability = numLargestClass/len(y_train)
+knn_accuracy = 1 - knn_best_model_error;
+
+print("==============================================")
+print("Best Dec Tree Accuracy: ", format(dec_tree_accuracy))
+print("Best KNN Model Accuracy: ", format(knn_accuracy))
+print("Largest Class Probability: ", format(largestClassProbability))
+print("==============================================")
