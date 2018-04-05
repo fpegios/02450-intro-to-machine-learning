@@ -18,6 +18,12 @@ knn_f = open('knn_data.pckl', 'rb')
 knn = pickle.load(knn_f)
 knn_f.close()
 
+print(log_reg[0])
+print("\n")
+print(log_reg[2])
+print("\n")
+print(knn[0])
+
 dec_tree_gen_error = dec_tree[len(dec_tree) - 1]
 log_reg_gen_error = log_reg[len(log_reg) - 1]
 knn_gen_error = knn[len(knn) - 1]
@@ -124,13 +130,13 @@ else:
     print('Classifiers are significantly different.')
 print("==============================================")
 
-# Boxplot to compare classifier error distributions
-figure()
-boxplot(np.concatenate((dec_tree_test_error, knn_test_error), axis=1))
-xlabel('Decision Tree vs KNN')
-ylabel('Cross-validation error')
-
-show()
+# # Boxplot to compare classifier error distributions
+# figure()
+# boxplot(np.concatenate((dec_tree_test_error, knn_test_error), axis=1))
+# xlabel('Decision Tree vs KNN')
+# ylabel('Cross-validation error')
+#
+# show()
 
 # [4.2] Compare in addition if the performance of your models
 # are better than simply predicting all outputs to be the largest

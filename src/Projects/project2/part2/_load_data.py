@@ -2,6 +2,7 @@
 import xlrd
 import numpy as np
 from scipy import stats
+from matplotlib.pyplot import figure, title, subplot, plot, boxplot, xlabel, ylabel, show, hist
 
 doc = xlrd.open_workbook('../../dataset.xls').sheet_by_index(0)
 numAttributes = 10
@@ -26,3 +27,27 @@ C = len(classNames)
 N, M = X.shape
 
 # X = X[0:150,:]
+
+data = X[:, 0];
+
+# figure()
+#
+# subplot(1,3,1)
+# hist(X[:,1])
+# title('height')
+# subplot(1,3,2)
+# hist(X[:,2])
+# title('length')
+# subplot(1,3,3)
+# hist(X[:,4])
+# title('p_and')
+#
+# show()
+
+# correlation = np.empty((numAttributes, numAttributes))
+#
+# for i in range(numAttributes):
+#     for j in range(numAttributes):
+#         correlation[i, j] = np.corrcoef(X[:, i], X[:, j])[0, 1]
+#
+# print(correlation)
