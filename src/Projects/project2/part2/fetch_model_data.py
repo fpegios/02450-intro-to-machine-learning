@@ -18,10 +18,10 @@ knn_f = open('knn_data.pckl', 'rb')
 knn = pickle.load(knn_f)
 knn_f.close()
 
+print(dec_tree[0])
+# print("\n")
 print(log_reg[0])
-print("\n")
-print(log_reg[2])
-print("\n")
+# print("\n")
 print(knn[0])
 
 dec_tree_gen_error = dec_tree[len(dec_tree) - 1]
@@ -74,8 +74,8 @@ def knn_plot():
             knn_y_test_styles[i] = styles_circle[4]
 
     # attributes plot
-    attr_1 = 9;
-    attr_2 = 5;
+    attr_1 = 10;
+    attr_2 = 6;
 
     # KNN
     # Plot the training data points (color-coded) and test data points.
@@ -103,15 +103,15 @@ print("\n")
 
 # [4.1] Credibility Interval
 # Test if classifiers are significantly different by computing credibility interval.
-temp = np.zeros([len(dec_tree_test_error), 1])
-temp[:, 0] = dec_tree_test_error[:];
-dec_tree_test_error = temp;
+temp = np.zeros([len(log_reg_test_error), 1])
+temp[:, 0] = log_reg_test_error[:];
+log_reg_test_error = temp;
 
 temp = np.zeros([len(knn_test_error), 1])
 temp[:, 0] = knn_test_error[:];
 knn_test_error = temp;
 
-z = (dec_tree_test_error - knn_test_error)
+z = (log_reg_test_error - knn_test_error)
 zb = z.mean()
 K = 5
 nu = K-1
@@ -130,13 +130,13 @@ else:
     print('Classifiers are significantly different.')
 print("==============================================")
 
-# # Boxplot to compare classifier error distributions
-# figure()
-# boxplot(np.concatenate((dec_tree_test_error, knn_test_error), axis=1))
-# xlabel('Decision Tree vs KNN')
-# ylabel('Cross-validation error')
-#
-# show()
+# Boxplot to compare classifier error distributions
+figure()
+boxplot(np.concatenate((log_reg_test_error, knn_test_error), axis=1))
+xlabel('Multinomial Logistic Regression    vs    KNN')
+ylabel('Cross-validation error')
+
+show()
 
 # [4.2] Compare in addition if the performance of your models
 # are better than simply predicting all outputs to be the largest
@@ -151,6 +151,16 @@ for i in range(len(y_train)):
 largestClassProbability = numLargestClass/len(y_train)
 dec_tree_accuracy = 1 - dec_tree_best_model_error;
 
+log_reg_best_model_error = log_reg[1]
+y_train = log_reg[4];
+numLargestClass = 0
+for i in range(len(y_train)):
+    if y_train[i] == 1:  # class 1 (text) is the largest one
+        numLargestClass+=1;
+
+largestClassProbability = numLargestClass/len(y_train)
+log_reg_accuracy = 1 - log_reg_best_model_error;
+
 
 knn_best_model_error = knn[1]
 y_train = knn[3];
@@ -164,6 +174,7 @@ knn_accuracy = 1 - knn_best_model_error;
 
 print("==============================================")
 print("Best Dec Tree Accuracy: ", format(dec_tree_accuracy))
+print("Logistic Regression Model Accuracy: ", format(log_reg_accuracy))
 print("Best KNN Model Accuracy: ", format(knn_accuracy))
 print("Largest Class Probability: ", format(largestClassProbability))
 print("==============================================")

@@ -33,10 +33,10 @@ avg_error_c = np.empty(max_c)  # average error per c
 best_c = np.zeros(K_out)    # best error per k_out
 test_error_log_reg = np.empty(K_out)  # error per model
 best_log_reg_model_error = 1;
-best_log_reg_model_weight = np.zeros(numAttributes);
+best_log_reg_model_weight = np.zeros(numAttributes + 1);
 
 # KNN Variables
-max_l = 100
+max_l = 250
 error_per_l = np.empty((max_l, K_in))  # error per lambda for each k_in
 avg_error_l = np.empty(max_l)  # average error per lambda
 best_l = np.empty(K_out)    # best error per k_out
