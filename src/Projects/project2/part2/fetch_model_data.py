@@ -19,10 +19,14 @@ knn = pickle.load(knn_f)
 knn_f.close()
 
 # print(dec_tree[0])
+# print(dec_tree[1])
 # print("\n")
 # print(log_reg[0])
+# print(log_reg[1])
 # print("\n")
 # print(knn[0])
+# print(knn[1])
+# print("\n")
 
 dec_tree_gen_error = dec_tree[len(dec_tree) - 1]
 log_reg_gen_error = log_reg[len(log_reg) - 1]
@@ -88,9 +92,6 @@ def knn_plot():
         plot(knn_x_test[i, attr_1], knn_x_test[i, attr_2], 'kx', markersize=8)
     show()
 
-# dec_tree_graph()
-# knn_plot()
-
 print("\n")
 print("==============================================")
 print("     GENERALIZATION ERROR")
@@ -101,25 +102,28 @@ print("KNN: ", format(knn_gen_error))
 print("==============================================")
 print("\n")
 
+# dec_tree_graph()
+# knn_plot()
+
 # [4.1] Credibility Interval
 # Test if classifiers are significantly different by computing credibility interval.
-temp = np.zeros([len(log_reg_test_error), 1])
-temp[:, 0] = log_reg_test_error[:];
-log_reg_test_error = temp;
+temp = np.zeros([len(dec_tree_test_error), 1])
+temp[:, 0] = dec_tree_test_error[:];
+dec_tree_test_error = temp;
 
 temp = np.zeros([len(knn_test_error), 1])
 temp[:, 0] = knn_test_error[:];
 knn_test_error = temp;
 
-z = (log_reg_test_error - knn_test_error)
+z = (dec_tree_test_error - knn_test_error)
 zb = z.mean()
 K = 5
-nu = K-1
-sig =  (z-zb).std()  / np.sqrt(K-1)
+nu = K - 1
+sig = (z - zb).std() / np.sqrt(K - 1)
 alpha = 0.05
 
-zL = zb + sig * stats.t.ppf(alpha/2, nu);
-zH = zb + sig * stats.t.ppf(1-alpha/2, nu);
+zL = zb + sig * stats.t.ppf(alpha / 2, nu);
+zH = zb + sig * stats.t.ppf(1 - alpha / 2, nu);
 
 print("==============================================")
 print("     CREDIBILITY INTERVAL")
@@ -129,14 +133,16 @@ if zL <= 0 and zH >= 0:
 else:
     print('Classifiers are significantly different.')
 print("==============================================")
+print("\n")
 
 # Boxplot to compare classifier error distributions
 figure()
-boxplot(np.concatenate((log_reg_test_error, knn_test_error), axis=1))
-xlabel('Multinomial Logistic Regression    vs    KNN')
+boxplot(np.concatenate((dec_tree_test_error, knn_test_error), axis=1))
+xlabel('Decision Tree    vs    KNN')
 ylabel('Cross-validation error')
 
 show()
+
 
 # [4.2] Compare in addition if the performance of your models
 # are better than simply predicting all outputs to be the largest
@@ -145,10 +151,10 @@ dec_tree_best_model_error = dec_tree[1]
 y_train = dec_tree[3];
 numLargestClass = 0
 for i in range(len(y_train)):
-    if y_train[i] == 1: # class 1 (text) is the largest one
-        numLargestClass+=1;
+    if y_train[i] == 1:  # class 1 (text) is the largest one
+        numLargestClass += 1;
 
-largestClassProbability = numLargestClass/len(y_train)
+largestClassProbability = numLargestClass / len(y_train)
 dec_tree_accuracy = 1 - dec_tree_best_model_error;
 
 log_reg_best_model_error = log_reg[1]
@@ -156,20 +162,19 @@ y_train = log_reg[4];
 numLargestClass = 0
 for i in range(len(y_train)):
     if y_train[i] == 1:  # class 1 (text) is the largest one
-        numLargestClass+=1;
+        numLargestClass += 1;
 
-largestClassProbability = numLargestClass/len(y_train)
+largestClassProbability = numLargestClass / len(y_train)
 log_reg_accuracy = 1 - log_reg_best_model_error;
-
 
 knn_best_model_error = knn[1]
 y_train = knn[3];
 numLargestClass = 0
 for i in range(len(y_train)):
-    if y_train[i] == 1: # class 1 (text) is the largest one
-        numLargestClass+=1;
+    if y_train[i] == 1:  # class 1 (text) is the largest one
+        numLargestClass += 1;
 
-largestClassProbability = numLargestClass/len(y_train)
+largestClassProbability = numLargestClass / len(y_train)
 knn_accuracy = 1 - knn_best_model_error;
 
 print("==============================================")
