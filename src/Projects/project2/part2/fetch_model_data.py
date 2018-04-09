@@ -18,11 +18,11 @@ knn_f = open('knn_data.pckl', 'rb')
 knn = pickle.load(knn_f)
 knn_f.close()
 
-print(dec_tree[0])
+# print(dec_tree[0])
 # print("\n")
-print(log_reg[0])
+# print(log_reg[0])
 # print("\n")
-print(knn[0])
+# print(knn[0])
 
 dec_tree_gen_error = dec_tree[len(dec_tree) - 1]
 log_reg_gen_error = log_reg[len(log_reg) - 1]

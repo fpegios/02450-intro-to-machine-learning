@@ -60,8 +60,8 @@ for train_out_index, test_out_index in CV_out.split(X):
         print('    Computing CV_in fold: {0}/{1}..'.format(k_in + 1, K_in))
 
         # extract training and test set for current CV_in fold
-        X_train_in, Y_train_in = X[train_in_index, :], Y[train_in_index]
-        X_test_in, Y_test_in = X[test_in_index, :], Y[test_in_index]
+        X_train_in, Y_train_in = X_train_out[train_in_index, :], Y_train_out[train_in_index]
+        X_test_in, Y_test_in = X_train_out[test_in_index, :], Y_train_out[test_in_index]
 
         # DECISION TREE
         for depth_index, depth in enumerate(tree_complexity):
@@ -73,7 +73,7 @@ for train_out_index, test_out_index in CV_out.split(X):
             # find estimated test error for each X_test_in value
             error_y_est_test_in = sum(np.abs(y_est_test_in - Y_test_in)) / float(len(y_est_test_in))
             # find average estimated test error per depth for each k_out
-            error_per_depth[depth_index, k_out] = error_y_est_test_in.mean()
+            error_per_depth[depth_index, k_in] = error_y_est_test_in.mean()
 
         # LOGISTIC REGRESSION
         for c_index in range(0, max_c):
@@ -85,7 +85,7 @@ for train_out_index, test_out_index in CV_out.split(X):
             # find estimated test error for each X_test_in value
             error_y_est_test_in = sum(np.abs(y_est_test_in - Y_test_in)) / float(len(y_est_test_in))
             # find average estimated test error per depth for each k_out
-            error_per_c[c_index, k_out] = error_y_est_test_in.mean()
+            error_per_c[c_index, k_in] = error_y_est_test_in.mean()
 
         # KNN
         for l_index in range(0, max_l):
@@ -97,7 +97,7 @@ for train_out_index, test_out_index in CV_out.split(X):
             # find estimated test error for each X_test_in value
             error_y_est_test_in = sum(np.abs(y_est_test_in - Y_test_in)) / float(len(y_est_test_in))
             # find average estimated test error per depth for each k_out
-            error_per_l[l_index, k_out] = error_y_est_test_in.mean()
+            error_per_l[l_index, k_in] = error_y_est_test_in.mean()
 
         k_in += 1
 

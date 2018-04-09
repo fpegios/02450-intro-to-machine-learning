@@ -55,7 +55,8 @@ for train_index, test_index in CV.split(X,y):
 # Test if classifiers are significantly different using methods in section 9.3.3
 # by computing credibility interval. Notice this can also be accomplished by computing the p-value using
 # [tstatistic, pvalue] = stats.ttest_ind(Error_logreg,Error_dectree)
-# and test if the p-value is less than alpha=0.05. 
+# and test if the p-value is less than alpha=0.05.
+print(Error_logreg)
 z = (Error_logreg-Error_dectree)
 print(np.zeros([3,3]))
 zb = z.mean()
