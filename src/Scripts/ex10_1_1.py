@@ -14,14 +14,14 @@ N, M = X.shape
 C = len(classNames)
 
 # Number of clusters:
-K = 4
+K = 5
 
 # K-means clustering:
-centroids, cls, inertia = k_means(X,K)
+centroids, cls, inertia = k_means(X,K, n_init=1)
     
 # Plot results:
 figure(figsize=(14,9))
-clusterplot(X, cls, centroids, y)
+clusterplot(X, cls, centroids)
 show()
 
 print('Ran Exercise 10.1.1')
