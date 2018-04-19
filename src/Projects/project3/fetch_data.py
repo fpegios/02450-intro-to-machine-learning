@@ -17,13 +17,12 @@ cds = gmm[3]
 CVE = gmm[4]
 KRange = gmm[5]
 
-
 # Plot CV error per K
 figure(1);
 plot(KRange, 2*CVE,'-ok')
 legend(['Crossvalidation'])
 xlabel('K')
-show()
+
 
 print('==============================================')
 print('Best K: {0}'.format(bestK))
@@ -32,3 +31,4 @@ print('==============================================')
 # Cluster Plot
 figure(figsize=(14,9))
 clusterplot(X, clusterid=cls, centroids=cds, y=Y)
+show()

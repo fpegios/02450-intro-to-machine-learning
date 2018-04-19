@@ -1,6 +1,4 @@
 import numpy as np
-from matplotlib.pyplot import figure, plot, legend, xlabel, show
-from scipy.io import loadmat
 from sklearn.mixture import GaussianMixture
 from sklearn import model_selection
 import pickle
@@ -37,7 +35,6 @@ for t, K in enumerate(KRange):
         CVE[t] += -gmm.score_samples(X_test).sum()
 
     if CVE[t] < minCV:
-        print(K)
         bestK = K
         minCV = CVE[t]
 
@@ -50,13 +47,6 @@ cds = best_gmm.means_
 
 # Save results
 f = open('gmm_data.pckl', 'wb')
-pickle.dump([bestK,
-             best_gmm,
-             cls,
-             cds,
-             CVE,
-             KRange
-             ],
-            f)
+pickle.dump([ bestK, best_gmm, cls, cds, CVE, KRange ], f)
 f.close()
 
