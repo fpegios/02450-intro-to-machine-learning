@@ -24,6 +24,7 @@ Rand = np.zeros((K,))
 Jaccard = np.zeros((K,))
 NMI = np.zeros((K,))
 
+print(y)
 for k in range(K):
     # run K-means clustering:
     #cls = Pycluster.kcluster(X,k+1)[0]
@@ -32,7 +33,7 @@ for k in range(K):
     Rand[k], Jaccard[k], NMI[k] = clusterval(y,cls)    
         
 # Plot results:
-
+print(Rand)
 figure(1)
 title('Cluster validity')
 plot(np.arange(K)+1, Rand)

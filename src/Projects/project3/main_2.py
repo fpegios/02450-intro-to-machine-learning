@@ -6,17 +6,33 @@ from toolbox_02450 import clusterplot
 from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 from _load_data import *
 
-# Perform hierarchical/agglomerative clustering on data matrix
-Method = 'complete'
-Metric = 'euclidean'
+# fetch data
+gmm_f = open('gmm_data.pckl', 'rb')
+gmm = pickle.load(gmm_f)
+gmm_f.close()
+bestK = gmm[0]
+PC = gmm[1]
 
-Z = linkage(X, method=Method, metric=Metric)
+# Perform hierarchical/agglomerative clustering on data matrix
+# Method = 'single'
+# Method = 'average'
+Method = 'complete'
+# Metric = 'euclidean'
+Metric = 'mahalanobis'
+
+Z = linkage(PC, method=Method, metric=Metric)
 
 # Compute and display clusters by thresholding the dendrogram
-Maxclust = 8
-cls = fcluster(Z, criterion='maxclust', t=Maxclust)
+Maxclust = bestK
+clsHIER = fcluster(Z, criterion='maxclust', t=Maxclust)
+
+# Save data results
+f = open('hier_data.pckl', 'wb')
+pickle.dump([ clsHIER, Z ], f)
+f.close()
+
 figure(1)
-clusterplot(X, cls.reshape(cls.shape[0],1), y=Y)
+clusterplot(PC, clusterid=clsHIER.reshape(clsHIER.shape[0],1), y=Y)
 
 # Display dendrogram
 max_display_levels=6

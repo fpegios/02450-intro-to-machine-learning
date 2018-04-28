@@ -2,6 +2,8 @@ import numpy as np
 from sklearn.mixture import GaussianMixture
 from sklearn import model_selection
 import pickle
+from scipy.linalg import svd
+from toolbox_02450 import clusterplot
 from _load_data import *
 
 # Range of K's to try
@@ -38,15 +40,36 @@ for t, K in enumerate(KRange):
         bestK = K
         minCV = CVE[t]
 
-# Fit Gaussian mixture model to X_train
-best_gmm = GaussianMixture(n_components=bestK, covariance_type=covar_type, n_init=reps).fit(X)
-# extract cluster labels
-cls = best_gmm.predict(X)
-# extract cluster centroids (means of gaussians)
-cds = best_gmm.means_
+## PCA
+Xst = X - np.ones((N,1))*X.mean(0)
+# PCA by computing SVD of Y
+U,S,V = svd(Xst, full_matrices=False)
+V = V.T
+# Project data onto principal component space
+Z = Xst @ V
+# Indices of the principal components to be plotted
+i = 0
+j = 1
+# Principal Components
+PC = np.zeros((numInstances, 2))
 
-# Save results
+for c in range(C):
+    # select indices belonging to class c:
+    class_mask = Y==c
+    PC[class_mask, i] = Z[class_mask,i]
+    PC[class_mask, j] = Z[class_mask,j]
+
+# Fit Gaussian mixture model to Principal Components
+gmm = GaussianMixture(n_components=bestK, covariance_type=covar_type, n_init=reps).fit(PC)
+# extract cluster labels
+clsGMM = gmm.predict(PC)
+# extract cluster centroids (means of gaussians)
+cdsGMM = gmm.means_
+# extract cluster shapes (covariances of gaussians)
+covsGMM = gmm.covariances_
+
+# Save data results
 f = open('gmm_data.pckl', 'wb')
-pickle.dump([ bestK, best_gmm, cls, cds, CVE, KRange ], f)
+pickle.dump([ bestK, PC, gmm, clsGMM, cdsGMM, covsGMM, CVE, KRange ], f)
 f.close()
 
