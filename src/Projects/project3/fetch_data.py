@@ -1,6 +1,6 @@
 import pickle
 import numpy as np
-from matplotlib.pyplot import figure, plot, ylim, title, legend, xlabel, ylabel, show
+from matplotlib.pyplot import figure, plot, ylim, title, legend, xlabel, ylabel, show, xticks, yticks
 from toolbox_02450 import clusterplot
 from scipy.cluster.hierarchy import dendrogram
 from _load_data import *
@@ -43,13 +43,17 @@ print('==============================================')
 # Cluster Plot
 figure
 clusterplot(PC, clusterid=clsGMM, centroids=cdsGMM, covars=covsGMM, y=Y)
+xticks(fontsize=14)
+yticks(fontsize=14)
 show()
 
 # Plot CV error per K
 figure
 plot(KRange, 2*CVE,'-ok')
-legend(['Crossvalidation Error'])
-xlabel('K')
+ylabel('Cross-validation Error', fontsize=14)
+xticks(fontsize=14)
+yticks(fontsize=14)
+xlabel('Number of clusters (K)', fontsize=14)
 show()
 ########################################################
 
@@ -58,12 +62,15 @@ show()
 # PART 2 - HIERARCHICAL CLUSTERING
 figure(1)
 clusterplot(PC, clusterid=clsHIER.reshape(clsHIER.shape[0],1), y=Y)
+xticks(fontsize=14)
+yticks(fontsize=14)
 
 # Display dendrogram
 max_display_levels=6
 figure(2, figsize=(10,4))
-dendrogram(Z, truncate_mode='level', p=max_display_levels)
-
+dendrogram(Z, truncate_mode='level', p=max_display_levels, leaf_font_size=14)
+xticks(fontsize=14)
+yticks(fontsize=14)
 show()
 ########################################################
 
@@ -85,4 +92,4 @@ print('Rand: {0}'.format(rand[1]))
 print('Jaccard: {0}'.format(jaccard[1]))
 print('NMI: {0}'.format(nmi[1]))
 print('==============================================')
-########################################################
+#######################################################

@@ -489,7 +489,7 @@ def clusterplot(X, clusterid, centroids='None', y='None', covars='None'):
         if i<C: legend_items[i] = 'Class: {0}'.format(legend_items[i]);
         elif i<C+K: legend_items[i] = 'Cluster: {0}'.format(legend_items[i]);
         else: legend_items[i] = 'Centroid: {0}'.format(legend_items[i]);
-    plt.legend(legend_items, numpoints=1, markerscale=.75, prop={'size': 9})
+    plt.legend(legend_items, numpoints=1, markerscale=.75, prop={'size': 9}, fontsize=14)
 
 
 def gauss_2d(centroid, ccov, std=2, points=100):

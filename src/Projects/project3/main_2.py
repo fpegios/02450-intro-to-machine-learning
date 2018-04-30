@@ -1,5 +1,5 @@
 import numpy as np
-from matplotlib.pyplot import figure, plot, legend, xlabel, show
+from matplotlib.pyplot import figure, plot, legend, xlabel, show, xticks, yticks
 from sklearn import model_selection
 import pickle
 from toolbox_02450 import clusterplot
@@ -31,12 +31,13 @@ f = open('hier_data.pckl', 'wb')
 pickle.dump([ clsHIER, Z ], f)
 f.close()
 
-figure(1)
-clusterplot(PC, clusterid=clsHIER.reshape(clsHIER.shape[0],1), y=Y)
+# figure(1)
+# clusterplot(PC, clusterid=clsHIER.reshape(clsHIER.shape[0],1), y=Y)
 
 # Display dendrogram
 max_display_levels=6
 figure(2,figsize=(10,4))
 dendrogram(Z, truncate_mode='level', p=max_display_levels)
-
+xticks(fontsize=14)
+yticks(fontsize=14)
 show()
